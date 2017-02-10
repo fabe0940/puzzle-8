@@ -23,11 +23,6 @@ class Puzzle8 {
 			{ 3, 4, 5 },
 			{ 6, 7, 8 },
 		}));
-		goals.add(new Board(new int[][] {
-			{ 1, 2, 3 },
-			{ 4, 5, 6 },
-			{ 7, 8, 0 },
-		}));
 
 		move = 0;
 		running = true;
