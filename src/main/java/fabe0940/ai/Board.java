@@ -6,8 +6,6 @@ import java.util.Random;
 
 class Board {
 	private static final int dim = 3;
-	private static final int random_min = 300;
-	private static final int random_max = 500;
 	private int[][] vals;
 
 	/* Print a board to stdout */
@@ -50,28 +48,22 @@ class Board {
 	}
 
 	/* Create a randomized board */
-	public static Board randomize() {
+	public static Board randomize(int randomMoves) {
 		int moves;
-		int moves_total;
 		int tile;
-		Board next;
 		Board randomized;
 		Random rng;
+		List<Integer> tiles;
 
 		randomized = new Board();
 		rng = new Random();
 
-		moves_total = rng.nextInt(random_max - random_min + 1) + random_min;
-
 		moves = 0;
-		while (moves < moves_total) {
-			tile = rng.nextInt((dim * dim) - 1) + 1;
-			next = randomized.move(tile);
-
-			if (next != null) {
-				randomized = next;
-				moves++;
-			}
+		while (moves < randomMoves) {
+			tiles = randomized.getMoves();
+			tile = tiles.get(rng.nextInt(tiles.size()));
+			randomized = randomized.move(tile);
+			moves++;
 		}
 
 		return randomized;
@@ -184,7 +176,19 @@ class Board {
 
 	/* Get the board data */
 	public int[][] getValues() {
-		return vals.clone();
+		int col;
+		int row;
+		int[][] copy;
+
+		copy = new int[dim][dim];
+
+		for (row = 0; row < dim; row++) {
+			for (col = 0; col < dim; col++) {
+				copy[row][col] = vals[row][col];
+			}
+		}
+
+		return copy;
 	}
 
 	public List<Integer> getMoves() {
