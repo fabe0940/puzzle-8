@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 class Board {
-	private static final int dim = 3;
+	public static final int dim = 3;
 	private int[][] vals;
 
 	/* Print a board to stdout */
