@@ -5,9 +5,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 class Board {
-	private static final int dim = 3;
-	private static final int random_min = 3;
-	private static final int random_max = 5;
+	public static final int dim = 3;
 	private int[][] vals;
 
 	/* Print a board to stdout */
@@ -50,28 +48,22 @@ class Board {
 	}
 
 	/* Create a randomized board */
-	public static Board randomize() {
+	public static Board randomize(int randomMoves) {
 		int moves;
-		int moves_total;
 		int tile;
-		Board next;
 		Board randomized;
 		Random rng;
+		List<Integer> tiles;
 
 		randomized = new Board();
 		rng = new Random();
 
-		moves_total = rng.nextInt(random_max - random_min + 1) + random_min;
-
 		moves = 0;
-		while (moves < moves_total) {
-			tile = rng.nextInt(9) + 1;
-			next = randomized.move(tile);
-
-			if (next != null) {
-				randomized = next;
-				moves++;
-			}
+		while (moves < randomMoves) {
+			tiles = randomized.getMoves();
+			tile = tiles.get(rng.nextInt(tiles.size()));
+			randomized = randomized.move(tile);
+			moves++;
 		}
 
 		return randomized;
@@ -86,7 +78,7 @@ class Board {
 
 		for (row = 0; row < dim; row++) {
 			for (col = 0; col < dim; col++) {
-				vals[row][col] = (3 * row) + col;
+				vals[row][col] = (dim * row) + col;
 			}
 		}
 
@@ -143,6 +135,74 @@ class Board {
 		from_row = 0;
 		to_col = 0;
 		to_row = 0;
+
+		moves = getMoves();
+
+		/* Check if the requested move is legal */
+		if (moves.contains(val)) {
+			after = getValues();
+
+			/* Get the coordinates of the tile to be moved */
+			for (row = 0; row < dim; row++) {
+				for (col = 0; col < dim; col++) {
+					if (getEntry(row, col) == val) {
+						to_col = col;
+						to_row = row;
+					}
+				}
+			}
+
+			/* Get the coordinates of the blank tile */
+			for (row = 0; row < dim; row++) {
+				for (col = 0; col < dim; col++) {
+					if (getEntry(row, col) == 0) {
+						from_col = col;
+						from_row = row;
+					}
+				}
+			}
+
+			/* Move the tile */
+			after[from_row][from_col] = val;
+			after[to_row][to_col] = 0;
+
+			result = new Board(after);
+		} else {
+			result = null;
+		}
+
+		return result;
+	}
+
+	/* Get the board data */
+	public int[][] getValues() {
+		int col;
+		int row;
+		int[][] copy;
+
+		copy = new int[dim][dim];
+
+		for (row = 0; row < dim; row++) {
+			for (col = 0; col < dim; col++) {
+				copy[row][col] = vals[row][col];
+			}
+		}
+
+		return copy;
+	}
+
+	public List<Integer> getMoves() {
+		int col;
+		int row;
+		int from_col;
+		int from_row;
+		List<Integer> moves;
+
+		col = 0;
+		row = 0;
+		from_col = 0;
+		from_row = 0;
+
 		moves = new LinkedList<Integer>();
 
 		/* Find the empty square */
@@ -169,35 +229,7 @@ class Board {
 			moves.add(getEntry(from_row, from_col - 1));
 		}
 
-		/* Check if the requested move is legal */
-		if (moves.contains(val)) {
-			after = getValues();
-
-			/* Get the coordinates of the tile to be moved */
-			for (row = 0; row < dim; row++) {
-				for (col = 0; col < dim; col++) {
-					if (getEntry(row, col) == val) {
-						to_col = col;
-						to_row = row;
-					}
-				}
-			}
-
-			/* Move the tile */
-			after[from_row][from_col] = val;
-			after[to_row][to_col] = 0;
-
-			result = new Board(after);
-		} else {
-			result = null;
-		}
-
-		return result;
-	}
-
-	/* Get the board data */
-	public int[][] getValues() {
-		return vals.clone();
+		return moves;
 	}
 
 	/* Get a specific entry */
